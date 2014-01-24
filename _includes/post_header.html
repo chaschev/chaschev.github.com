@@ -5,7 +5,7 @@
                 {{ page.date | date: "%B %e, %Y" }}
                 <small>
                     . {{ page.category }} .
-                    <a href="http://ocramius.github.io{{ page.url }}#disqus_thread" data-disqus-identifier="{{ page.url }}">Comments</a>
+                    <a href="http://chaschev.github.io{{ page.url }}#disqus_thread" data-disqus-identifier="{{ page.url }}">Comments</a>
                 </small>
             </strong>
             <br/>
@@ -32,18 +32,18 @@
             {% endif %}
         </p>
         <p class="post-contributions-bar">
-            <a class="btn btn-mini btn-warning" href="https://github.com/Ocramius/ocramius.github.com/edit/master/_posts/{{ page.date | date: '%Y-%m-%d' }}{{ page.url | remove_first:'/blog' | replace_first:'/','-' | replace_first:'/','-' |replace_first:'/','-' | remove:'/' }}.html" target="_blank">
+            <a class="btn btn-mini btn-warning" href="https://github.com/chaschev/chaschev.github.com/edit/master/_posts/{{ page.date | date: '%Y-%m-%d' }}{{ page.url | remove_first:'/blog' | replace_first:'/','-' | replace_first:'/','-' |replace_first:'/','-' | remove:'/' }}.html" target="_blank">
                 Found a mistake?
             </a>
             <iframe
-                src="http://ghbtns.com/github-btn.html?user=Ocramius&type=follow&count=true"
+                src="http://ghbtns.com/github-btn.html?user=chaschev&type=follow&count=true"
                 allowtransparency="true"
                 frameborder="0"
                 scrolling="0"
                 width="130px"
                 height="20px"
             ></iframe>
-            <a href="https://twitter.com/ocramius" class="twitter-follow-button" data-show-count="false">Follow @ocramius</a>
+            <a href="https://twitter.com/AndreyChaschev" class="twitter-follow-button" data-show-count="false">Follow @AndreyChaschev</a>
         </p>
     </div>
 
