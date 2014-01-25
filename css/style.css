@@ -32,3 +32,19 @@ pre {
     margin-top: 14px;
     margin-bottom: 7px;
 }
+
+.post-content p {
+    line-height: 1.5em;
+}
+
+.post-content ul {
+    margin-top: 12px;
+}
+
+div.highlight{
+    margin: 20px 0;
+}
+
+.post-content li {
+    line-height: 24px;
+}
