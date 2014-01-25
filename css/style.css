@@ -22,3 +22,13 @@ pre {
 .twitter-tweet.twitter-tweet-rendered {
     width: 100%;
 }
+
+.content h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px !important;
+}
+
+.content h4, h5 {
+    margin-top: 14px;
+    margin-bottom: 7px !important;
+}

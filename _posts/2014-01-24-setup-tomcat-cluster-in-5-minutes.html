@@ -13,12 +13,144 @@ description:
 
 <div class="row">
     <div class="span12 columns">
-        <p>This article shows how to:
-            <ul>
-                <li>Install JDK, Maven and Tomcat to your cluster</li>
-                <li>Make Tomcat multi-instance configuration per each host</li>
-                <li>Start, stop and check status of the services</li>
-            </ul>
-        </p>
+        <p>In this article I will show how to use Bear to:</p>
+        <ul>
+            <li>Install JDK, Maven and Tomcat to your cluster</li>
+            <li>Make Tomcat multi-instance configuration per each host</li>
+            <li>Start, stop and check status of the Tomcat services</li>
+            <li>Run remote commands to manually test that everything is ok</li>
+        </ul>
+
+        <hr/>
+
+        <h2>Background</h2>
+
+        <p>Bear is a lightweight remote automation tool for Groovy/Java/JVM. Bear differs from other existing tools in that it's using programmatic approach. In Bear your deployment is a regular Java class which can be run via <code>main()</code>. Bear loves static type safety, chained method calls, FP and fluent programming techniques.</p>
+
+        <h2>Installing Bear</h2>
+
+        Bear requires:
+
+        <ul>
+            <li>1+ remote machine with Linux, standard password authentication</li>
+            <li>JDK 8 EA (recommended for UI), JDK 7+ to run console/UI</li>
+            <li>Maven 3+. <code>mvn</code> must be available in the command line. <a href="http://www.mkyong.com/maven/how-to-install-maven-in-windows/">How to install Maven on Windows</a></li>
+        </ul>
+
+        <p>To install Bear, type in your command line (admin rights might be needed):</p>
+
+        {% highlight sh %}$ mvn com.chaschev:installation-maven-plugin:1.4:install -Dartifact=com.chaschev:bear{% endhighlight %}
+
+        <h2>Creating a Project</h2>
+
+        <p>Create a directory or use an existing for you deployment, then</p>
+
+        {% highlight sh %}
+$ mkdir tomcat-demo
+$ cd tomcat-demo
+
+# generates a new project for your hosts, i.e. vm04, vm05, vm06
+$ bear --create tomcat-demo --template java.tomcat --hosts="vm04,vm05,vm06" --user your-ssh-user --password your-pass
+{% endhighlight %}
+
+        <p>Here <code>java</code> and <code>tomcat</code> are the tags to add features to the generated project. Note: if you plan to use not the latest update of the JDK (7u51 by the time of writing), you need to specify your Oracle.com credentials by providing <code>--oracleUser</code> and <code>--oraclePassword</code>.</p>
+
+        <h2>Specify versions</h2>
+<p>Open the generate project in <code>.bear/TomcatDemoProject.groovy</code> and edit configuration to set the version of the tools to install:</p>
+
+{% highlight groovy %}
+@Override
+protected GlobalContext configureMe(GlobalContextFactory factory) throws Exception {
+  java.acceptLicense.set true
+
+  java.version.set "7u51"
+  tomcat.version.set "7.0.50"
+  maven.version.set "3.1.1"
+
+  bear.appStartTimeoutSec.set(600)            // override startup timeout for Tomcat
+
+  ...
+{% endhighlight %}
+
+      <h2>Add Tomcat Instances</h2>
+
+        <p>Instances are added by simply enumerating ports. All other internal Tomcat ports will adjust accordingly per each instance:</p>
+{% highlight groovy %}
+   tomcat.instancePorts.set "8080, 8081"
+{% endhighlight %}
+
+      <h2>Run Installations</h2>
+
+     <p>Now we are ready to run setup. To get the best results make sure you have no JDK installed on your machines. If you do, you might want to uninstall them or you could leave it as is and Bear will overwrite references like <code>/usr/bin/java</code> and <code>/usr/bin/javac</code></p>
+
+{% highlight sh %}
+$ bear tomcat-demo.setup
+{% endhighlight %}
+
+<p><i>tomcat-demo</i> is the name of our project and <i>setup</i> is the name of the method in this class (actually it's a method of a super-class). This task will install JDK, Maven, Tomcat and will also create services and shortcuts to run scripts. There is also
+    <a href="https://github.com/chaschev/bear/wiki/2.1.1.-Creating-and-running-a-new-project">instruction of how to run a project via an IDE</a>.</p>
+
+     <h2>Start & Stop Tomcat Instances</h2>
+
+<p>In the UI click the status tab and type in the prompt:</p>
+
+{% highlight sh %}
+tomcat-start
+{% endhighlight %}
+
+<p>To check the status or stop the instances use <code>tomcat-status</code> or <code>tomcat-stop</code>.</p>
+
+<p>Note: normally when deploying a project you would just do <code>$ bear tomcat-demo.deploy</code> to deploy it and restart the services. </p>
+
+    <h2>Verify Manually</h2>
+
+<p>For those who are like me curious how the whole thing works and configured, select any of the host tabs and type</p>
+
+{% highlight sh %}
+ls /var/lib/bear/tools/tomcat/current/ -w 1
+..
+bin
+conf
+instances
+lib
+logs
+webapps
+work
+{% endhighlight %}
+
+<p>Gives you the list of Tomcat's home. Everything as usual except the <code>instances</code> folder, which contains runtime and configuration per each instance:</p>
+
+{% highlight sh %}
+$ ls /var/lib/bear/tools/tomcat/current/ -w 1
+tomcat-8080
+tomcat-8081
+
+$ ls /var/lib/bear/tools/tomcat/current/tomcat-8080 -w 1
+conf
+logs
+webapps
+{% endhighlight %}
+
+        <p>To manually start/stop instances or edit upstart scripts, type:</p>
+
+{% highlight sh %}
+# Prints the service commands for your OS
+cat `which tomcat-status`
+
+# Prints the status for an instance
+sudo service tomcat-8080 status
+sudo service tomcat-8080 stop
+
+# Will print the upstart script content
+cat /etc/init/tomcat-8080.conf
+{% endhighlight %}
     </div>
 </div>
+
+        <h2>Results</h2>
+
+        <p>In this article I showed you how to quickly setup Tomcat environment with Bear. So you can from now drop your WARs in the created webapps to deploy your projects. You can also use Bear for this and it will allow you to do additional things like checking out your project from version control, building your WAR, creating a release folder for it, rolling back to one of the previous releases.</p>
+
+        <p>Have fun with your deployments! </p>
+
+        <p>Andrey.</p>
