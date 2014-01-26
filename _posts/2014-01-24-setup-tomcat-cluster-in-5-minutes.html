@@ -65,7 +65,7 @@ protected GlobalContext configureMe(GlobalContextFactory factory) throws Excepti
   tomcat.version.set "7.0.50"
   maven.version.set "3.1.1"
 
-  bear.appStartTimeoutSec.set(600)            // override startup timeout for Tomcat
+  bear.appStartTimeoutSec.set(600)         // override startup timeout for Tomcat
 
   ...
 {% endhighlight %}
@@ -86,7 +86,10 @@ $ bear tomcat-demo.setup
 {% endhighlight %}
 
 <p><i>tomcat-demo</i> is the name of our project and <i>setup</i> is the name of the method in this class (actually it's a method of a super-class). This task will install JDK, Maven, Tomcat and will also create services and shortcuts to run scripts. There is also
-    <a href="https://github.com/chaschev/bear/wiki/2.1.1.-Creating-and-running-a-new-project">instruction of how to run a project via an IDE</a>.</p>
+    <a href="https://github.com/chaschev/bear/wiki/2.1.1.-Creating-and-running-a-new-project">instruction of how to run a project via an IDE</a>. If everything is ok you should see the Bear's UI as on a screenshot:</p>
+
+<img src="https://raw.github.com/chaschev/chaschev.github.com/img/posts/2014-01-24-setup-tomcat-cluster-in-5-minutes/setup-done.png" alt="Setup Finished" />
+
 
      <h2>Start & Stop Tomcat Instances</h2>
 
