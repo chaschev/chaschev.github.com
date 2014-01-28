@@ -1,0 +1,71 @@
+---
+layout: post
+title: Downloading Java with Java - an Endless Source of Surprises
+category: Java
+tags: javafx, oracle
+year: 2014
+month: 1
+day: 26
+published: false
+summary:
+description:
+---
+
+<p> I want to share my experiences on downloading JDK with Java. The title may sound provocative, and it was not funny at all, in the end I managed to download the JDK with Java code and the result is
+    <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a>. The whole process of installing Java apps has always been annoying for both developer and end user, and goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's
+    <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a></p>
+
+<p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article</p>
+
+<h2>How to Get Oracle's JDK on the Net</h2>
+
+<p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Strange thing, ORA: -1.</p>
+
+<h2>Which Approach or Technology to Choose?</h2>
+
+<p>I found two existing solutions:</p>
+
+<ul>
+    <li>(Ruby) <a href="https://github.com/yyuu/capistrano-jdk-installer">capistrano-jdk-installer</a></li>
+    <li>(Java) <code><a
+            href="http://grepcode.com/file/repo1.maven.org/maven2/org.eclipse.hudson/hudson-core/3.1.0/hudson/tools/JDKInstaller.java#JDKInstaller">JDKInstaller</a></code> in Jenkins Sources</li>
+</ul>
+
+<p>The first approach is in Ruby which I tried to mimic with both <code>HttpClient</code> and <code><a
+        href="https://github.com/GistLabs/mechanize">Mechanize</a></code>. It has a dependency on Jenkins list of JDKs urls, you also need to login into Oracle's site to download older releases. While implementing this I had issues with SSL certificates support and not being logged in for sequential request. From my practice such solutions usually just don't work or require too much maintainence, so I decided to move on with something less confusing.</p>
+
+<p>Which is browser emulation. Of course! You can always download a file as if it was a user download who browsed the site, entered his data, filled the forms. ORA: -1 for filling out the forms and really messy experience while downloading JDK of a previous version. Another ORA: -1 goes for blocking my account. :-) (Don't worry, this most probably won't happen to you - I just had too many debug sessions.) Updating in time is nice, but in most situations is not the case when your code goes live.</p>
+
+<p>Selenium WebDriver is fine and stable, but gives a lot of dependencies and might not be an option for a project not using it. So my choice was the <code>WebView</code> from JavaFX 2.</p>
+
+<h2>Using WebView</h2>
+
+<h3>The algorithm</h3>
+
+<img src="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
+     alt="Downloading JDK Scheme"/>
+
+<h3>SimpleBrowser</h3>
+
+<p>I developed a <code>SimpleBrowser</code> component which is a wrapper for the WebView. I will think of writing an article about it. At the moment <code>SimpleBrowser</code> adds following features to the <code>WebView</code>.</p>
+
+<ul>
+    <li><code>useFirebug</code> - embed Firebug Lite panel</li>
+    <li><code>useJQuery</code> - embed jQuery when loading a page</li>
+    <li><code>load(url, callback)</code> - opens a page and runs a callback when it is ready</li>
+    <li><code>getHTML()</code> - get HTML of a current page</li>
+    <li><code>createWebView</code> - optional WebView, WebEngine-only mode</li>
+    <li><code>waitFor()</code> - waits for a jQuery condition to become true, i.e. an element to appear</li>
+    <li>Logging via JavaScript's <code>alert()</code>'s</li>
+</ul>
+
+<h3>Following Redirects</h3>
+
+<p>WebView does this for you, however I don't know if it's a bug, but I was unable to wait for a page to load after a redirect in a normal way. So I added <code>SimpleBrowser::waitFor</code> which waits in a separate Thread for element to appear with jQuery.</p>
+
+<h3>Logging</h3>
+
+<p>I found two ways to log JavaScript and both at the moment are more of a joke, WebView: -1. The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple hours almost crying "where did my panel go?", ORA: -1 for emotional abuse. Oh, just kidding. </p>
+
+<p>The other one is to define an alert event handler for the <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
+
