@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How to setup a Tomcat Cluster in 5 minutes with Bear
+title: How to Setup a Tomcat Cluster in 5 Minutes with Bear
 category: Java
 tags: java groovy tomcat bear
 year: 2014
@@ -88,7 +88,7 @@ $ bear tomcat-demo.setup
 <p><i>tomcat-demo</i> is the name of our project and <i>setup</i> is the name of the method in this class (actually it's a method of a super-class). This task will install JDK, Maven, Tomcat and will also create services and shortcuts to run scripts. There is also
     <a href="https://github.com/chaschev/bear/wiki/2.1.1.-Creating-and-running-a-new-project">instruction of how to run a project via an IDE</a>. If everything is ok you should see the Bear's UI as on a screenshot:</p>
 
-<img src="https://raw2.github.com/chaschev/chaschev.github.com/master/img/posts/2014-01-24-setup-tomcat-cluster-in-5-minutes/setup-done.png" alt="Setup Finished" />
+<img src="/img/posts/2014-01-24-setup-tomcat-cluster-in-5-minutes/setup-done.png" alt="Setup Finished" />
 
 
      <h2>Start & Stop Tomcat Instances</h2>
@@ -97,7 +97,12 @@ $ bear tomcat-demo.setup
 
 {% highlight sh %}
 tomcat-start
+tomcat-status
 {% endhighlight %}
+
+<p>Click any of the hosts tab, at the bottom of the scroll you should see:</p>
+
+<img src="/img/posts/2014-01-24-setup-tomcat-cluster-in-5-minutes/tomcat-status.png" alt="tomcat-status"/>
 
 <p>To check the status or stop the instances use <code>tomcat-status</code> or <code>tomcat-stop</code>.</p>
 
@@ -138,11 +143,12 @@ webapps
 # Prints the service commands for your OS
 cat `which tomcat-status`
 
-# Prints the status for an instance
+# Prints the status for an instance, comes from previous command output
 sudo service tomcat-8080 status
 sudo service tomcat-8080 stop
 
 # Will print the upstart script content
+# This script defines the Tomcat service in the OS
 cat /etc/init/tomcat-8080.conf
 {% endhighlight %}
 
