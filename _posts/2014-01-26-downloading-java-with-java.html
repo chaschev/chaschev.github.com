@@ -11,19 +11,42 @@ summary:
 description:
 ---
 
-<p> I want to share my experiences on downloading JDK with Java. The title may sound provocative, and it was not funny at all, in the end I managed to download the JDK with Java code and the result is
+<p> I want to share my experiences on downloading JDK with Java. The title may sound provocative, and it was not funny at all, but in the end I managed to download the JDK with Java code and the result is
     <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a>. The whole process of installing Java apps has always been annoying for both developer and end user, and goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's
-    <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a></p>
+    <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a>.</p>
 
-<p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article</p>
+<p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article.</p>
+
+<p>The result are a few lines of code to download the JDK:</p>
+
+{% highlight Java %}
+import static bear.fx.DownloadFxApp.*;
+
+public static void main(String[] args){
+    version = "7u51";
+    tempDestDir = new File(".");
+    miniMode = false;
+    launchUI();
+
+    DownloadFxApp downloadFxApp = getInstance().awaitDownload(1, TimeUnit.HOURS);
+
+    DownloadFxApp.DownloadResult r = downloadFxApp.downloadResult.get();
+
+    downloadFxApp.stop();
+
+    System.out.println("Downloaded to: " + r.file.getPath());
+}
+{% endhighlight %}
 
 <h2>How to Get Oracle's JDK on the Net</h2>
 
-<p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Strange thing, ORA: -1.</p>
+<p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Which is a strange thing, Oracle.</p>
+
+<p>This article contains a small portion of criticism for Oracle which is initially meant to be constructive. Being a Java Developer for 8+ years already, I really want to avoid any sort of confrontation when I highlight Oracle misses.</p>
 
 <h2>Which Approach or Technology to Choose?</h2>
 
-<p>I found two existing solutions:</p>
+<p>I found two existing open source solutions which download JDK from Oracle's site:</p>
 
 <ul>
     <li>(Ruby) <a href="https://github.com/yyuu/capistrano-jdk-installer">capistrano-jdk-installer</a></li>
@@ -31,16 +54,24 @@ description:
             href="http://grepcode.com/file/repo1.maven.org/maven2/org.eclipse.hudson/hudson-core/3.1.0/hudson/tools/JDKInstaller.java#JDKInstaller">JDKInstaller</a></code> in Jenkins Sources</li>
 </ul>
 
-<p>The first approach is in Ruby which I tried to mimic with both <code>HttpClient</code> and <code><a
-        href="https://github.com/GistLabs/mechanize">Mechanize</a></code>. It has a dependency on Jenkins list of JDKs urls, you also need to login into Oracle's site to download older releases. While implementing this I had issues with SSL certificates support and not being logged in for sequential request. From my practice such solutions usually just don't work or require too much maintainence, so I decided to move on with something less confusing.</p>
+<p>The first approach is in Ruby which I tried to mimic by using both <code>HttpClient</code> and <code><a
+        href="https://github.com/GistLabs/mechanize">Mechanize</a></code>. This approach has a dependency on a pre-populated list of JDKs urls placed on Jenkins site. And you also need to login into Oracle's site to download older releases. While implementing this I had issues with SSL certificates support and not being logged in for sequential request. From my practice such solutions usually just don't work or require too much maintainence, so I decided to move on with something less confusing.</p>
 
-<p>Which is browser emulation. Of course! You can always download a file as if it was a user download who browsed the site, entered his data, filled the forms. ORA: -1 for filling out the forms and really messy experience while downloading JDK of a previous version. Another ORA: -1 goes for blocking my account. :-) (Don't worry, this most probably won't happen to you - I just had too many debug sessions.) Updating in time is nice, but in most situations is not the case when your code goes live.</p>
+<p>Which is browser emulation. Of course! You can always download a file as if it was a user download who browsed the site, entered his data, filled the forms, read the yadayada. -1 to Oracle for filling out the forms, the UI of 90s and really messy experience while downloading JDK of a previous version. Another -1 Oracle receives for blocking my account. :-) Don't worry, this most probably won't happen to you - I just had too many debug sessions. Updating in time is nice, but in most situations is not the case when your code goes live.</p>
 
-<p>Selenium WebDriver is fine and stable, but gives a lot of dependencies and might not be an option for a project not using it. So my choice was the <code>WebView</code> from JavaFX 2.</p>
+<p>Selenium WebDriver is fine and stable, but gives a lot of dependencies and might not be an option for a project which is not using it. So my choice was the <code>WebView</code> from JavaFX 2.</p>
 
 <h2>Using WebView</h2>
 
+<p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse the WebPages. In Java 8 the WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
+
+<p>Desktop apps seem like a yesterday today, so I'm having hard times understanding where Oracle is going to. For example, Bear uses JavaFX to render the local web page UI, so instead of using JavaFX 2 components, it uses modern web technologies like AngularJS or Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer, why would anyone want to hire a JavaFX developer to write some CSS forms when he could build his app on far more productive Javascript Web Stack? How many times this would be cheaper? 2, 5, 10?</p>
+
 <h3>The algorithm</h3>
+
+<p>Below is the workflow scheme for traversing the download pages and filling registration forms. The entry point is a page <a
+        href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">Java SE Development Kit 7 Downloads</a> or
+    <a href="http://www.oracle.com/technetwork/java/archive-139210.html">Oracle Java Archive</a></p>
 
 <img src="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
      alt="Downloading JDK Scheme"/>
@@ -54,18 +85,103 @@ description:
     <li><code>useJQuery</code> - embed jQuery when loading a page</li>
     <li><code>load(url, callback)</code> - opens a page and runs a callback when it is ready</li>
     <li><code>getHTML()</code> - get HTML of a current page</li>
-    <li><code>createWebView</code> - optional WebView, WebEngine-only mode</li>
+    <li><code>createWebView</code> - WebView is an optional visual component, this enables a WebEngine-only mode</li>
     <li><code>waitFor()</code> - waits for a jQuery condition to become true, i.e. an element to appear</li>
     <li>Logging via JavaScript's <code>alert()</code>'s</li>
 </ul>
 
+<h3>Getting the links from a web page</h3>
+
+<p>This is simple when you can use jQuery - just add a function which utilizes jQuery selectors and returns the link found. </p>
+
+{% highlight Java %}
+browser.getEngine().executeScript(
+    scriptText() + "\n " +     // adds function definitions
+    "downloadIfFound('" + version + "', true, 'linux');"
+);
+{% endhighlight %}
+
+<p>The source of the <code>scriptText</code> is <a href="https://github.com/chaschev/javafx-download-jdk/blob/master/src/main/resources/fx/downloadJDK.js">at the GitHub</a>. This way it is not really efficient to compile a long script for each click, but it's ok for less demanding tasks or demonstration purposes.</p>
+
+<h3>Clicking a link</h3>
+
+<p>I copied code from this Stackoverflow.com answer: <a
+        href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a>. <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for the WebEngine.</p>
+
+{% highlight JavaScript %}
+var clickIt = function($el){
+var el = $el[0];
+var etype = 'click';
+
+clickDom(el, etype);
+}
+
+var clickDom = function(el, etype){
+    if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+    } else {
+        var evObj = document.createEvent('Events');
+
+        evObj.initEvent(etype, true, false);
+
+        el.dispatchEvent(evObj);
+    }
+}
+{% endhighlight %}
+
+<h3>Embedding jQuery</h3>
+
+<p>To embed jQuery (or any other library) into existing page one requires only to add a <code>&lt;script ...></code> entry to the <code>&lt;head ...></code> node, which is easy with JavaScript. </p>
+
+<p>The problem is that this script is loaded asynchronously, so I needed to provide a Java callback which is called from JavaScript when the script loads. There could also be a problem of too frequent sequential loads, so I actually implemented a queue which would store callbacks with their eventIds and fire them when the script loads for a given initial eventId.</p>
+
+<p>A short version of a page load schema is shown below.</p>
+
+<p><b>Note:</b> this is all hidden for the user of the <code>SimpleBrowser</code>.</p>
+
+{% highlight Java %}
+void SimpleBrowser::load(url, Runnable onLoad) {
+    int eventId = random.nextInt();
+
+    webEngine.load(url);
+
+    whenPageLoaded({
+        jQueryLoads.put(eventId, load);
+
+        if(useJQuery) embedJQuery(eventId);
+    } as Runnable);
+}
+
+void SimpleBrowser::embedJQuery(int eventId){
+    webEngine.executeScript("insertNode($eventId);");
+};
+
+//JavaScript:
+var insertNode = function(eventId){
+    var scriptNode = ...;   // inserts a script node
+
+    scriptNode.onload = function(){
+        // run a callback on a Java side
+        window.simpleBrowser.jQueryReady(eventId);
+    }
+}
+{% endhighlight %}
+
+
 <h3>Following Redirects</h3>
 
-<p>WebView does this for you, however I don't know if it's a bug, but I was unable to wait for a page to load after a redirect in a normal way. So I added <code>SimpleBrowser::waitFor</code> which waits in a separate Thread for element to appear with jQuery.</p>
+<p>WebView does this for you, however I don't know if it's a bug, but I was unable to wait for a page to load after a redirect in a normal way. So I added <code>SimpleBrowser::waitFor</code> which waits in a separate Thread for element to appear based on jQuery condition, i.e. <code>$('#id').length > 0</code>.</p>
 
 <h3>Logging</h3>
 
-<p>I found two ways to log JavaScript and both at the moment are more of a joke, WebView: -1. The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple hours almost crying "where did my panel go?", ORA: -1 for emotional abuse. Oh, just kidding. </p>
+<p>I found two ways to log JavaScript and both at the moment are more of a joke, -1 to WebView. (+10 to WebView for otherwise great and unique technology.) The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple of hours almost crying "where did my panel go?", -1 to Oracle for emotional abuse. Oh, just kidding. </p>
 
 <p>The other one is to define an alert event handler for the <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
 
+<h2>Points of Interest</h2>
+
+<p>In this article I showed how to work with the WebView to load pages, embed external JS libraries into a page, click links and wait for content to appear.</p>
+
+<p>One of the messiest thing in this process was debugging the states of the WebView, understanding the states of the WebEngine to load the pages and finding problems when having heap dumps (i.e. in situations when you make something illegal - like calling a Java method with a bad argument in JavaScript or weird bugs like calling a method of GC-ed object (this is my guess for the type of bugs I did not understand).</p>
+
+<p>I am really happy that in the end I was able to simplify such a challenging task as downloading Java with Java. Pieces of this code could be used as a basis for a library which could be built upon the WebView.</p>
