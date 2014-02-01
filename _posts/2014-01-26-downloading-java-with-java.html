@@ -4,9 +4,9 @@ title: Downloading Java with Java - an Endless Source of Surprises
 category: Java
 tags: javafx, oracle
 year: 2014
-month: 1
-day: 26
-published: false
+month: 2
+day: 1
+published: true
 summary:
 description:
 ---
@@ -63,22 +63,22 @@ public static void main(String[] args){
 
 <h2>Using WebView</h2>
 
-<p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse the WebPages. In Java 8 the WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
+<p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse the WebPages. In Java 8 the WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle for Nashorn, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
 
-<p>Desktop apps seem like a yesterday today, so I'm having hard times understanding where Oracle is going to. For example, Bear uses JavaFX to render the local web page UI, so instead of using JavaFX 2 components, it uses modern web technologies like AngularJS or Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer, why would anyone want to hire a JavaFX developer to write some CSS forms when he could build his app on far more productive Javascript Web Stack? How many times this would be cheaper? 2, 5, 10?</p>
+<p>Desktop apps seem like a yesterday today, so I'm having hard times understanding where Oracle is going to. For example, Bear uses JavaFX to render the local web page UI, so instead of using JavaFX 2 components, it uses modern web technologies like AngularJS or Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer, why would anyone want to hire a JavaFX developer to create some crazy FXML forms when he could build his app on far more productive Javascript Web Stack? How many times this would be cheaper? 2, 5, 10?</p>
 
 <h3>The algorithm</h3>
 
 <p>Below is the workflow scheme for traversing the download pages and filling registration forms. The entry point is a page <a
-        href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">Java SE Development Kit 7 Downloads</a> or
-    <a href="http://www.oracle.com/technetwork/java/archive-139210.html">Oracle Java Archive</a></p>
+        href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">The Latest JDK Version Page</a> or
+    <a href="http://www.oracle.com/technetwork/java/archive-139210.html">Oracle Java Archive</a>. Some of the elements of this scheme are described below in more detail.</p>
 
 <img src="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
      alt="Downloading JDK Scheme"/>
 
 <h3>SimpleBrowser</h3>
 
-<p>I developed a <code>SimpleBrowser</code> component which is a wrapper for the WebView. I will think of writing an article about it. At the moment <code>SimpleBrowser</code> adds following features to the <code>WebView</code>.</p>
+<p>I developed a <code>SimpleBrowser</code> component which is a wrapper for the <code>WebView</code>. At the moment <code>SimpleBrowser</code> adds the following features to the <code>WebView</code>:</p>
 
 <ul>
     <li><code>useFirebug</code> - embed Firebug Lite panel</li>
@@ -92,7 +92,7 @@ public static void main(String[] args){
 
 <h3>Getting the links from a web page</h3>
 
-<p>This is simple when you can use jQuery - just add a function which utilizes jQuery selectors and returns the link found. </p>
+<p>This is simple when you have jQuery - just add a function which uses jQuery selectors to visit DOM tree nodes and return the link found: </p>
 
 {% highlight Java %}
 browser.getEngine().executeScript(
@@ -101,7 +101,7 @@ browser.getEngine().executeScript(
 );
 {% endhighlight %}
 
-<p>The source of the <code>scriptText</code> is <a href="https://github.com/chaschev/javafx-download-jdk/blob/master/src/main/resources/fx/downloadJDK.js">at the GitHub</a>. This way it is not really efficient to compile a long script for each click, but it's ok for less demanding tasks or demonstration purposes.</p>
+<p>The source of the <code>scriptText()</code> is <a href="https://github.com/chaschev/javafx-download-jdk/blob/master/src/main/resources/fx/downloadJDK.js">at the GitHub</a>. Note that this script is quite long and it is not really efficient to compile it for each Java-to-JS call, but it's ok for less demanding tasks or demonstration purposes.</p>
 
 <h3>Clicking a link</h3>
 
@@ -110,10 +110,10 @@ browser.getEngine().executeScript(
 
 {% highlight JavaScript %}
 var clickIt = function($el){
-var el = $el[0];
-var etype = 'click';
+    var el = $el[0];
+    var etype = 'click';
 
-clickDom(el, etype);
+    clickDom(el, etype);
 }
 
 var clickDom = function(el, etype){
@@ -174,7 +174,7 @@ var insertNode = function(eventId){
 
 <h3>Logging</h3>
 
-<p>I found two ways to log JavaScript and both at the moment are more of a joke, -1 to WebView. (+10 to WebView for otherwise great and unique technology.) The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple of hours almost crying "where did my panel go?", -1 to Oracle for emotional abuse. Oh, just kidding. </p>
+<p>I found two ways to log JavaScript and both at the moment are more of a joke, -1 to WebView (+10 to WebView for otherwise great and unique technology). The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple of hours almost crying "where did my panel go?", -1 to Oracle for emotional abuse. Oh, just kidding. </p>
 
 <p>The other one is to define an alert event handler for the <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
 
@@ -182,6 +182,6 @@ var insertNode = function(eventId){
 
 <p>In this article I showed how to work with the WebView to load pages, embed external JS libraries into a page, click links and wait for content to appear.</p>
 
-<p>One of the messiest thing in this process was debugging the states of the WebView, understanding the states of the WebEngine to load the pages and finding problems when having heap dumps (i.e. in situations when you make something illegal - like calling a Java method with a bad argument in JavaScript or weird bugs like calling a method of GC-ed object (this is my guess for the type of bugs I did not understand).</p>
+<p>One of the messiest thing in this process was debugging the states of the WebView, understanding the states of the WebEngine to load the pages and finding problems when having heap dumps. I.e. in situations when you make something illegal - like calling a Java method with a bad argument in JavaScript or weird bugs like calling a method of GC-ed object (this is my guess for the type of bugs I did not understand).</p>
 
 <p>I am really happy that in the end I was able to simplify such a challenging task as downloading Java with Java. Pieces of this code could be used as a basis for a library which could be built upon the WebView.</p>
