@@ -1,18 +1,18 @@
 ---
 layout: post
-title: Downloading Java with Java - an Endless Source of Surprises
+title: Downloading Java with Java - the Longest Journey
 category: Java
 tags: javafx, oracle
 year: 2014
 month: 2
 day: 1
 published: true
-summary:
+summary: A shortcut to 100 easy steps to download Java.
 description:
 ---
 
 <p> I want to share my experiences on downloading JDK with Java. The title may sound provocative, and it was not funny at all, but in the end I managed to download the JDK with Java code and the result is
-    <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a>. The whole process of installing Java apps has always been annoying for both developer and end user, and goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's
+    <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a> and the end user requires only a few lines of code to download the JDK. The whole process of installing Java apps has always been annoying for both developer and end user, and goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's
     <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a>.</p>
 
 <p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article.</p>
@@ -85,12 +85,12 @@ public static void main(String[] args){
     <li><code>useJQuery</code> - embed jQuery when loading a page</li>
     <li><code>load(url, callback)</code> - opens a page and runs a callback when it is ready</li>
     <li><code>getHTML()</code> - get HTML of a current page</li>
-    <li><code>createWebView</code> - WebView is an optional visual component, this enables a WebEngine-only mode</li>
+    <li><code>createWebView</code> - WebView is an optional visual component, this enables a WebEngine-only mode. In Java 8 however one is still required to start the stage and there is a feature request in JavaFX tracker to make JavaFX available for headless environment</li>
     <li><code>waitFor()</code> - waits for a jQuery condition to become true, i.e. an element to appear</li>
     <li>Logging via JavaScript's <code>alert()</code>'s</li>
 </ul>
 
-<h3>Getting the links from a web page</h3>
+<h3>Getting links from a web page</h3>
 
 <p>This is simple when you have jQuery - just add a function which uses jQuery selectors to visit DOM tree nodes and return the link found: </p>
 
@@ -106,7 +106,7 @@ browser.getEngine().executeScript(
 <h3>Clicking a link</h3>
 
 <p>I copied code from this Stackoverflow.com answer: <a
-        href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a>. <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for the WebEngine.</p>
+        href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a>. <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for WebEngine.</p>
 
 {% highlight JavaScript %}
 var clickIt = function($el){
@@ -180,8 +180,8 @@ var insertNode = function(eventId){
 
 <h2>Points of Interest</h2>
 
-<p>In this article I showed how to work with the WebView to load pages, embed external JS libraries into a page, click links and wait for content to appear.</p>
+<p>In this article I showed how to work with WebView to load pages, embed external JS libraries into a page, click links and wait for content to appear.</p>
 
-<p>One of the messiest thing in this process was debugging the states of the WebView, understanding the states of the WebEngine to load the pages and finding problems when having heap dumps. I.e. in situations when you make something illegal - like calling a Java method with a bad argument in JavaScript or weird bugs like calling a method of GC-ed object (this is my guess for the type of bugs I did not understand).</p>
+<p>One of the messiest thing in this process was debugging the states of WebView, understanding the states of WebEngine to load the pages and finding problems when having heap dumps. I.e. in situations when you make something illegal - like calling a Java method with a bad argument in JavaScript or weird bugs like calling a method of GC-ed object (this is my guess for the type of bugs I did not understand).</p>
 
-<p>I am really happy that in the end I was able to simplify such a challenging task as downloading Java with Java. Pieces of this code could be used as a basis for a library which could be built upon the WebView.</p>
+<p>Pieces of this code could be used as a basis for a library which could be built upon WebView. I am really happy that in the end I was able to simplify such a challenging task as downloading Java with Java. </p>
