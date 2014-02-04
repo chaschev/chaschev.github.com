@@ -16,13 +16,13 @@ description:
 <p>When downloading the latest stable version of JDK from <a
         href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">Oracle.com</a>, a user will require only two clicks:</p>
 
-<a href="/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png"><img src="/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png" alt="Downloading JDK 7 at Oracle.com"/></a>
+<a href="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png"><img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png" alt="Downloading JDK 7 at Oracle.com"/></a>
 <hr/>
 <p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article.</p>
 
 <p>The result are a few lines of code to download the JDK:</p>
 
-{% highlight Java %}
+<pre lang="Java">
 import static bear.fx.DownloadFxApp.*;
 
 public static void main(String[] args){
@@ -39,7 +39,7 @@ public static void main(String[] args){
 
     System.out.println("Downloaded to: " + r.file.getPath());
 }
-{% endhighlight %}
+</pre>
 
 <p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Which is a strange thing, Oracle.</p>
 
@@ -66,7 +66,7 @@ public static void main(String[] args){
 
 <p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse  web pages. In Java 8 WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle for Nashorn, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
 
-<p>Here are my thoughts on WebView vs JavaFX: today desktop apps seem a bit outdated, so I'm having hard times understanding where Oracle is going to when updating Swing to JavaFX 2. Why not to use WebView to render modern web UI technologies like Backbone or AngularJS and bind them to the app? For example, Bear uses JavaFX to render a local web page UI, so instead of using JavaFX 2 components, it uses AngularJS and Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer (i.e. you write your UI app for a server and this code could also be run locally), why would anyone want to hire a JavaFX developer to create some crazy FXML forms when he could build his app based on a more productive JavaScript UI stack? How many times this would be cheaper? 2, 5, 10?</p>
+<p>My thoughts on WebView vs JavaFX? Nowadays desktop apps seem a bit outdated, so I'm confused with Oracle updating Swing to JavaFX 2. Why can't they use WebView to render modern web UI technologies like Backbone or AngularJS and bind them to the app? For example, Bear uses JavaFX to render a local web page UI, so instead of using JavaFX 2 components, it uses AngularJS and Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer (i.e. you write your UI app for a server and this code could also be run locally), why would anyone want to hire a JavaFX developer to create some crazy FXML forms when he could build his app based on a more productive JavaScript UI stack? How many times this would be cheaper? 2, 5, 10? I really hope Oracle would consider focusing on the modern web which grows so rapidly.</p>
 
 <h3>The algorithm</h3>
 
@@ -74,7 +74,7 @@ public static void main(String[] args){
         href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">The Latest JDK Version Page</a> or
     <a href="http://www.oracle.com/technetwork/java/archive-139210.html">Oracle Java Archive</a>. Some of the elements of this scheme are described below in more detail.</p>
 
-<img src="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
+<img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
      alt="Downloading JDK Scheme"/>
 
 <h3>SimpleBrowser</h3>
@@ -95,12 +95,12 @@ public static void main(String[] args){
 
 <p>This is simple when you have jQuery - just add a function which uses jQuery selectors to visit DOM tree nodes and return the link found: </p>
 
-{% highlight Java %}
+<pre lang="Java">
 browser.getEngine().executeScript(
     scriptText() + "\n " +     // adds function definitions
     "downloadIfFound('" + version + "', true, 'linux');"
 );
-{% endhighlight %}
+</pre>
 
 <p>The source of the <code>scriptText()</code> is <a href="https://github.com/chaschev/javafx-download-jdk/blob/master/src/main/resources/fx/downloadJDK.js">at the GitHub</a>. Note that this script is quite long and it is not really efficient to compile it for each Java-to-JS call, but it's ok for less demanding tasks or demonstration purposes.</p>
 
@@ -109,7 +109,7 @@ browser.getEngine().executeScript(
 <p>I copied code from this Stackoverflow.com answer: <a
         href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a> <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for WebEngine.</p>
 
-{% highlight JavaScript %}
+<pre lang="JavaScript">
 var clickIt = function($el){
     var el = $el[0];
     var etype = 'click';
@@ -128,7 +128,7 @@ var clickDom = function(el, etype){
         el.dispatchEvent(evObj);
     }
 }
-{% endhighlight %}
+</pre>
 
 <h3>Embedding jQuery</h3>
 
@@ -140,7 +140,7 @@ var clickDom = function(el, etype){
 
 <p><b>Note:</b> this is all hidden for the user of <code>SimpleBrowser</code>.</p>
 
-{% highlight Java %}
+<pre lang="Java">
 void SimpleBrowser::load(url, Runnable onLoad) {
     int eventId = random.nextInt();
 
@@ -166,7 +166,7 @@ var insertNode = function(eventId){
         window.simpleBrowser.jQueryReady(eventId);
     }
 }
-{% endhighlight %}
+</pre>
 
 
 <h3>Following redirects</h3>
@@ -183,8 +183,8 @@ var insertNode = function(eventId){
 
 <p>Download starts when there is a location property change event for WebEngine, which provides the download location. I use Apache's <code>HttpClient</code> library and I also start a separate thread to download JDK. A bar shows the download progress: </p>
 
-<a href="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png">
-    <img src="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png" alt="Download Starts"/></a>
+<a href="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/download-starts.png">
+    <img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/download-starts.png" alt="Download Starts"/></a>
 
 <h2>Points of Interest</h2>
 
