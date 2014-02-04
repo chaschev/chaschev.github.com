@@ -16,13 +16,14 @@ description:
 <p>When downloading the latest stable version of JDK from <a
         href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">Oracle.com</a>, a user will require only two clicks:</p>
 
-<a href="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png"><img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png" alt="Downloading JDK 7 at Oracle.com"/></a>
+<a href="/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png">
+    <img height="300" src="/img/posts/2014-01-26-downloading-java-with-java/oracleCom.png" alt="Downloading JDK 7 at Oracle.com"/></a>
 <hr/>
 <p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article.</p>
 
 <p>The result are a few lines of code to download the JDK:</p>
 
-<pre lang="Java">
+{% highlight Java %}
 import static bear.fx.DownloadFxApp.*;
 
 public static void main(String[] args){
@@ -39,7 +40,7 @@ public static void main(String[] args){
 
     System.out.println("Downloaded to: " + r.file.getPath());
 }
-</pre>
+{% endhighlight %}
 
 <p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Which is a strange thing, Oracle.</p>
 
@@ -74,8 +75,8 @@ public static void main(String[] args){
         href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">The Latest JDK Version Page</a> or
     <a href="http://www.oracle.com/technetwork/java/archive-139210.html">Oracle Java Archive</a>. Some of the elements of this scheme are described below in more detail.</p>
 
-<img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png"
-     alt="Downloading JDK Scheme"/>
+<a href="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png">
+    <img height="250" src="/img/posts/2014-01-26-downloading-java-with-java/downloading-JDK.png" alt="Downloading JDK Scheme"/></a>
 
 <h3>SimpleBrowser</h3>
 
@@ -95,12 +96,12 @@ public static void main(String[] args){
 
 <p>This is simple when you have jQuery - just add a function which uses jQuery selectors to visit DOM tree nodes and return the link found: </p>
 
-<pre lang="Java">
+{% highlight Java %}
 browser.getEngine().executeScript(
     scriptText() + "\n " +     // adds function definitions
     "downloadIfFound('" + version + "', true, 'linux');"
 );
-</pre>
+{% endhighlight %}
 
 <p>The source of the <code>scriptText()</code> is <a href="https://github.com/chaschev/javafx-download-jdk/blob/master/src/main/resources/fx/downloadJDK.js">at the GitHub</a>. Note that this script is quite long and it is not really efficient to compile it for each Java-to-JS call, but it's ok for less demanding tasks or demonstration purposes.</p>
 
@@ -109,7 +110,7 @@ browser.getEngine().executeScript(
 <p>I copied code from this Stackoverflow.com answer: <a
         href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a> <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for WebEngine.</p>
 
-<pre lang="JavaScript">
+{% highlight Java %}
 var clickIt = function($el){
     var el = $el[0];
     var etype = 'click';
@@ -128,7 +129,7 @@ var clickDom = function(el, etype){
         el.dispatchEvent(evObj);
     }
 }
-</pre>
+{% endhighlight %}
 
 <h3>Embedding jQuery</h3>
 
@@ -140,7 +141,7 @@ var clickDom = function(el, etype){
 
 <p><b>Note:</b> this is all hidden for the user of <code>SimpleBrowser</code>.</p>
 
-<pre lang="Java">
+{% highlight Java %}
 void SimpleBrowser::load(url, Runnable onLoad) {
     int eventId = random.nextInt();
 
@@ -166,7 +167,7 @@ var insertNode = function(eventId){
         window.simpleBrowser.jQueryReady(eventId);
     }
 }
-</pre>
+{% endhighlight %}
 
 
 <h3>Following redirects</h3>
@@ -183,8 +184,8 @@ var insertNode = function(eventId){
 
 <p>Download starts when there is a location property change event for WebEngine, which provides the download location. I use Apache's <code>HttpClient</code> library and I also start a separate thread to download JDK. A bar shows the download progress: </p>
 
-<a href="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/download-starts.png">
-    <img src="http://chaschev.github.io/img/posts/2014-01-26-downloading-java-with-java/download-starts.png" alt="Download Starts"/></a>
+<a href="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png">
+    <img src="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png" alt="Download Starts"/></a>
 
 <h2>Points of Interest</h2>
 
