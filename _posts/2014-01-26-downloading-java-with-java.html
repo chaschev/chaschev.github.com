@@ -179,6 +179,13 @@ var insertNode = function(eventId){
 
 <p>The other one is to define an alert event handler for <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
 
+<h3>Downloading a file</h3>
+
+<p>Download starts when there is a location property change event for WebEngine, which provides the download location. I use Apache's <code>HttpClient</code> library and I also start a separate thread to download JDK. A bar shows the download progress: </p>
+
+<a href="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png">
+    <img src="/img/posts/2014-01-26-downloading-java-with-java/download-starts.png" alt="Download Starts"/></a>
+
 <h2>Points of Interest</h2>
 
 <p>In this article I showed how to work with WebView to load pages, embed external JS libraries into a page, click links and wait for content to appear.</p>
