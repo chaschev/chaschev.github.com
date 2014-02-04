@@ -11,9 +11,7 @@ summary: A shortcut to 100 easy steps to download Java.
 description:
 ---
 
-<p> I want to share my experiences on downloading JDK with Java. The title may sound provocative, and it was not funny at all, but in the end I managed to download the JDK with Java code and the result is
-    <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a> and the end user requires only a few lines of code to download the JDK. The whole process of installing Java apps has always been annoying for both developer and end user, and goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's
-    <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a>.</p>
+<p> I want to share my experiences on downloading JDK with Java from Oracle.com. Yes, I needed to automatize the site navigation a user needs to do to download Java - there are several scenarios, some of which require logging into Oracle account. The title may sound provocative, and it was not funny at all, but in the end I managed to download the JDK with Java and the result is <a href="https://github.com/chaschev/javafx-download-jdk">shared at GitHub</a>. The whole process of installing Java apps has always been annoying for both a developer and an end user, and the goal of this article is to show less painful approach to auto install the JDK. It is by the way used in author's <a href="http://chaschev.github.io/bear/">remote automation tool Bear</a>.</p>
 
 <p>In this article I will only highlight the most interesting moments of solving this task with Java, if you have any question, leave them in the comment section below and I will answer and update the article.</p>
 
@@ -25,7 +23,7 @@ import static bear.fx.DownloadFxApp.*;
 public static void main(String[] args){
     version = "7u51";
     tempDestDir = new File(".");
-    miniMode = false;
+    miniMode = false;            // mini-mode hides the browser window
     launchUI();
 
     DownloadFxApp downloadFxApp = getInstance().awaitDownload(1, TimeUnit.HOURS);
@@ -37,8 +35,6 @@ public static void main(String[] args){
     System.out.println("Downloaded to: " + r.file.getPath());
 }
 {% endhighlight %}
-
-<h2>How to Get Oracle's JDK on the Net</h2>
 
 <p>There are no publicly available JDK archives on the net, because Oracle's license prohibits it, though Java is considered being an open platform. Which is a strange thing, Oracle.</p>
 
@@ -59,13 +55,13 @@ public static void main(String[] args){
 
 <p>Which is browser emulation. Of course! You can always download a file as if it was a user download who browsed the site, entered his data, filled the forms, read the yadayada. -1 to Oracle for filling out the forms, the UI of 90s and really messy experience while downloading JDK of a previous version. Another -1 Oracle receives for blocking my account. :-) Don't worry, this most probably won't happen to you - I just had too many debug sessions. Updating in time is nice, but in most situations is not the case when your code goes live.</p>
 
-<p>Selenium WebDriver is fine and stable, but gives a lot of dependencies and might not be an option for a project which is not using it. So my choice was the <code>WebView</code> from JavaFX 2.</p>
+<p>Selenium WebDriver is fine and stable, but gives a lot of dependencies and might not be an option for a project which is not using it. So my choice was <code>WebView</code> from JavaFX 2.</p>
 
 <h2>Using WebView</h2>
 
-<p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse the WebPages. In Java 8 the WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle for Nashorn, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
+<p>WebView is a simple component in JavaFX which is based on WebKit browser and can be used to browse  web pages. In Java 8 WebView received a new fast JavaScript engine called Nashorn which is up to x20 times faster than Rhino from Java 7, so the whole browsing experience is very smooth and indistinguishable from a regular browser like Chrome or Firefox. (Ok, +5 to Oracle for Nashorn, -1 for lacking JSR-221 integration in a WebView out-of-the box)</p>
 
-<p>Desktop apps seem like a yesterday today, so I'm having hard times understanding where Oracle is going to. For example, Bear uses JavaFX to render the local web page UI, so instead of using JavaFX 2 components, it uses modern web technologies like AngularJS or Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer, why would anyone want to hire a JavaFX developer to create some crazy FXML forms when he could build his app on far more productive Javascript Web Stack? How many times this would be cheaper? 2, 5, 10?</p>
+<p>Here are my thoughts on WebView vs JavaFX: today desktop apps seem a bit outdated, so I'm having hard times understanding where Oracle is going to when updating Swing to JavaFX 2. Why not to use WebView to render modern web UI technologies like Backbone or AngularJS and bind them to the app? For example, Bear uses JavaFX to render a local web page UI, so instead of using JavaFX 2 components, it uses AngularJS and Twitter Bootstrap. When this becomes a mainstream and desktop/web apps are transparent for the developer (i.e. you write your UI app for a server and this code could also be run locally), why would anyone want to hire a JavaFX developer to create some crazy FXML forms when he could build his app based on a more productive JavaScript UI stack? How many times this would be cheaper? 2, 5, 10?</p>
 
 <h3>The algorithm</h3>
 
@@ -78,7 +74,7 @@ public static void main(String[] args){
 
 <h3>SimpleBrowser</h3>
 
-<p>I developed a <code>SimpleBrowser</code> component which is a wrapper for the <code>WebView</code>. At the moment <code>SimpleBrowser</code> adds the following features to the <code>WebView</code>:</p>
+<p>I developed a <code>SimpleBrowser</code> component which is a wrapper for <code>WebView</code>. At the moment <code>SimpleBrowser</code> adds the following features to <code>WebView</code>:</p>
 
 <ul>
     <li><code>useFirebug</code> - embed Firebug Lite panel</li>
@@ -106,7 +102,7 @@ browser.getEngine().executeScript(
 <h3>Clicking a link</h3>
 
 <p>I copied code from this Stackoverflow.com answer: <a
-        href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a>. <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for WebEngine.</p>
+        href="http://stackoverflow.com/questions/2705583/how-to-simulate-a-click-with-javascript">How to simulate a click with JavaScript?</a> <code>clickIt</code>  would click a result of a jQuery selector, which would spawn navigation events for WebEngine.</p>
 
 {% highlight JavaScript %}
 var clickIt = function($el){
@@ -133,11 +129,11 @@ var clickDom = function(el, etype){
 
 <p>To embed jQuery (or any other library) into existing page one requires only to add a <code>&lt;script ...></code> entry to the <code>&lt;head ...></code> node, which is easy with JavaScript. </p>
 
-<p>The problem is that this script is loaded asynchronously, so I needed to provide a Java callback which is called from JavaScript when the script loads. There could also be a problem of too frequent sequential loads, so I actually implemented a queue which would store callbacks with their eventIds and fire them when the script loads for a given initial eventId.</p>
+<p>The problem is that this script is loaded asynchronously, so I needed to provide a Java callback which is called from JavaScript when the script loads. There could also be a problem of too frequent sequential loads, so there is a queue which would store callbacks with their eventIds and fire them when the script loads inside a web page for a given initial eventId.</p>
 
 <p>A short version of a page load schema is shown below.</p>
 
-<p><b>Note:</b> this is all hidden for the user of the <code>SimpleBrowser</code>.</p>
+<p><b>Note:</b> this is all hidden for the user of <code>SimpleBrowser</code>.</p>
 
 {% highlight Java %}
 void SimpleBrowser::load(url, Runnable onLoad) {
@@ -168,15 +164,15 @@ var insertNode = function(eventId){
 {% endhighlight %}
 
 
-<h3>Following Redirects</h3>
+<h3>Following redirects</h3>
 
 <p>WebView does this for you, however I don't know if it's a bug, but I was unable to wait for a page to load after a redirect in a normal way. So I added <code>SimpleBrowser::waitFor</code> which waits in a separate Thread for element to appear based on jQuery condition, i.e. <code>$('#id').length > 0</code>.</p>
 
 <h3>Logging</h3>
 
-<p>I found two ways to log JavaScript and both at the moment are more of a joke, -1 to WebView (+10 to WebView for otherwise great and unique technology). The first one is to use 3rd-party FirebugLite's console. Though this extension is great, I didn't like working with it at all in conjunction with WebView. The latest 1.4 just didn't work for me, in some cases you spend a couple of hours almost crying "where did my panel go?", -1 to Oracle for emotional abuse. Oh, just kidding. </p>
+<p>I found two ways to log JavaScript and both at the moment are more of a joke, -1 to WebView (+10 to WebView for otherwise great and unique technology). The first one is to use 3rd-party FirebugLite's console. Though this extension is awesome, I didn't like working with it at all in conjunction with WebView. The latest 1.4 version just didn't work for me, in some cases you spend a couple of hours almost crying "Firebug panel, please come back!", -1 to Oracle for emotional abuse. Oh, just kidding. </p>
 
-<p>The other one is to define an alert event handler for the <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
+<p>The other one is to define an alert event handler for <code>WebEngine</code> and use <code>alert()</code> to log in JS. It works well, but guys, seriously?</p>
 
 <h2>Points of Interest</h2>
 
